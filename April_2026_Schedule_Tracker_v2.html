@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>April 2026 — Schedule Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;padding:1rem}
+#app{max-width:1200px;margin:0 auto}
+.top{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #334155;border-radius:10px;margin-bottom:10px;background:#1e293b}
+.top-title{font-size:16px;font-weight:700;color:#f1f5f9}
+.top-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pcnt{font-size:12px;color:#94a3b8;white-space:nowrap}
+.pbar{width:90px;height:5px;background:#334155;border-radius:3px;overflow:hidden}
+.pfil{height:100%;background:#378ADD;border-radius:3px;transition:width .35s}
+.rbtn{font-size:11px;padding:3px 9px;border:1px solid #475569;border-radius:6px;background:transparent;color:#94a3b8;cursor:pointer}
+.rbtn:hover{background:#1e293b;color:#e2e8f0}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:.03em}
+.leg{display:flex;flex-wrap:wrap;gap:4px 10px;padding:7px 10px;border:1px solid #334155;border-radius:8px;margin-bottom:10px;background:#1e293b}
+.li{display:flex;align-items:center;gap:4px;font-size:11px;color:#94a3b8}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.week{margin-bottom:9px}
+.wlbl{font-size:11px;font-weight:700;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;padding-left:1px}
+.wgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.dc{border:1px solid #334155;border-radius:8px;overflow:hidden;background:#1e293b}
+.dc.emp{background:#0f172a;opacity:.2;min-height:50px}
+.dh{padding:5px 7px 4px;border-bottom:1px solid #334155}
+.dh.wday{background:#1a2744}
+.dh.wend{background:#2a1a44}
+.dh.rest{background:#1a2a1a}
+.dn{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em}
+.dd{font-size:15px;font-weight:700;color:#e2e8f0;line-height:1.25}
+.dp{font-size:11px;color:#64748b;margin-top:1px}
+.slist{padding:4px;display:flex;flex-direction:column;gap:3px}
+.slot{display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:4px;border:1px solid #334155;border-left-width:3px;cursor:pointer;background:#0f172a;transition:opacity .15s}
+.slot:hover{background:#1e293b}
+.slot.done{opacity:.35}
+.slot.done .sl{text-decoration:line-through}
+.sl{font-size:11px;color:#e2e8f0;line-height:1.3;flex:1}
+.st{font-size:10px;color:#64748b;display:block;margin-top:1px}
+.sc{width:14px;height:14px;border-radius:50%;border:1.5px solid #475569;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;transition:all .15s}
+.slot.done .sc{background:#639922;border-color:#639922}
+.today .dh{background:rgba(55,138,221,.25)!important}
+.today .dd{color:#60a5fa}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="top">
+    <div>
+      <div class="top-title">April 2026 — Schedule Tracker</div>
+      <div class="top-sub">4AM wake · Gym 6–8 · Swimming 8–9 · GATE 4.5hrs · Sleep 9:30PM</div>
+    </div>
+    <div class="top-r">
+      <span class="pcnt" id="cnt">—</span>
+      <div class="pbar"><div class="pfil" id="pfil" style="width:0"></div></div>
+      <button class="rbtn" id="rbtn" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+
+  <div class="badges">
+    <span class="badge" style="background:#1e3a5f;color:#93c5fd">📚 4.5 hrs GATE / day</span>
+    <span class="badge" style="background:#3f1515;color:#fca5a5">🏋️ 2 hrs Gym / day</span>
+    <span class="badge" style="background:#0f3d2e;color:#6ee7b7">🏊 1 hr Swimming / day</span>
+    <span class="badge" style="background:#2d2a10;color:#fde68a">😴 6.5 hrs Sleep</span>
+    <span class="badge" style="background:#1a1a2e;color:#c4b5fd">🌿 Full Sunday Rest</span>
+  </div>
+
+  <div class="leg">
+    <div class="li"><div class="ld" style="background:#888780"></div>Routine</div>
+    <div class="li"><div class="ld" style="background:#378ADD"></div>GATE Study</div>
+    <div class="li"><div class="ld" style="background:#E24B4A"></div>Gym</div>
+    <div class="li"><div class="ld" style="background:#1D9E75"></div>Swimming</div>
+    <div class="li"><div class="ld" style="background:#B4B2A9"></div>Shower + Bfast</div>
+    <div class="li"><div class="ld" style="background:#0F6E56"></div>Free / Buffer</div>
+    <div class="li"><div class="ld" style="background:#7F77DD"></div>Office / WFH</div>
+    <div class="li"><div class="ld" style="background:#475569"></div>Transition</div>
+    <div class="li"><div class="ld" style="background:#5F5E5A"></div>Wind Down</div>
+  </div>
+
+  <div id="weeks"></div>
+</div>
+
+<script>
+const C={r:'#888780',ga:'#378ADD',g:'#E24B4A',sw:'#1D9E75',sh:'#B4B2A9',fr:'#0F6E56',o:'#7F77DD',tr:'#475569',w:'#5F5E5A'};
+
+const WEEKDAY=[
+  {l:'Morning Routine',t:'4:00–4:30',c:C.r},
+  {l:'GATE Study — Block 1',t:'4:30–6:00',c:C.ga},
+  {l:'Gym — Weights',t:'6:00–8:00',c:C.g},
+  {l:'Swimming',t:'8:00–9:00',c:C.sw},
+  {l:'Shower',t:'9:00–9:30',c:C.sh},
+  {l:'Breakfast',t:'9:30–10:00',c:C.sh},
+  {l:'Free Time',t:'10:00–11:00',c:C.fr},
+  {l:'Office / WFH',t:'11:00–17:00',c:C.o},
+  {l:'Transition + Rest',t:'17:00–18:00',c:C.tr},
+  {l:'GATE Study — Block 2',t:'18:00–21:00',c:C.ga},
+  {l:'Wind Down',t:'21:00–21:30',c:C.w},
+];
+
+const SATURDAY=[
+  {l:'Morning Routine',t:'4:00–4:30',c:C.r},
+  {l:'GATE Study — Block 1',t:'4:30–6:00',c:C.ga},
+  {l:'Gym — Weights',t:'6:00–8:00',c:C.g},
+  {l:'Swimming',t:'8:00–9:00',c:C.sw},
+  {l:'Shower',t:'9:00–9:30',c:C.sh},
+  {l:'Breakfast',t:'9:30–10:00',c:C.sh},
+  {l:'Free Time',t:'10:00–18:00',c:C.fr},
+  {l:'GATE Study — Block 2',t:'18:00–21:00',c:C.ga},
+  {l:'Wind Down',t:'21:00–21:30',c:C.w},
+];
+
+const SUNDAY=[
+  {l:'Slow Wake Up',t:'7:00–8:00',c:C.r},
+  {l:'Leisurely Walk',t:'8:00–8:30',c:C.fr},
+  {l:'Brunch',t:'8:30–10:00',c:C.sh},
+  {l:'Full Leisure',t:'10:00–21:00',c:C.fr},
+  {l:'Wind Down',t:'21:00–21:30',c:C.w},
+];
+
+const DNS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DH_CLASS=['wday','wday','wday','wday','wday','wend','rest'];
+
+function getSched(d){const w=(d+1)%7;if(w===6)return SUNDAY;if(w===5)return SATURDAY;return WEEKDAY;}
+function getWd(d){return(d+1)%7;}
+
+const WEEKS=[[null,null,1,2,3,4,5],[6,7,8,9,10,11,12],[13,14,15,16,17,18,19],[20,21,22,23,24,25,26],[27,28,29,30,null,null,null]];
+const WLBLS=['Week 1  ·  Apr 1–5','Week 2  ·  Apr 6–12','Week 3  ·  Apr 13–19','Week 4  ·  Apr 20–26','Week 5  ·  Apr 27–30'];
+
+let done={};
+let confirmReset=false;
+const today=new Date();
+const todayDay=(today.getFullYear()===2026&&today.getMonth()===3)?today.getDate():null;
+
+function loadDone(){try{const s=localStorage.getItem('sagar_apr26_v3');if(s)done=JSON.parse(s);}catch(e){done={};}}
+function saveDone(){try{localStorage.setItem('sagar_apr26_v3',JSON.stringify(done));}catch(e){}}
+function sid(d,i){return`a${d}_${i}`;}
+
+function toggle(day,idx){
+  const id=sid(day,idx);
+  done[id]?delete done[id]:(done[id]=1);
+  saveDone();
+  const el=document.getElementById(id);
+  if(el){el.classList.toggle('done',!!done[id]);const chk=el.querySelector('.sc');if(chk)chk.textContent=done[id]?'✓':'';}
+  const sc=getSched(day);
+  const dc=sc.filter((_,i)=>done[sid(day,i)]).length;
+  const dp=document.getElementById(`dp${day}`);
+  if(dp)dp.textContent=`${dc}/${sc.length}`;
+  updateStats();
+}
+
+function totalSlots(){let t=0;for(let d=1;d<=30;d++)t+=getSched(d).length;return t;}
+function doneCount(){return Object.keys(done).length;}
+
+function updateStats(){
+  const total=totalSlots(),dc=doneCount();
+  const pct=total>0?Math.round(dc/total*100):0;
+  document.getElementById('cnt').textContent=`${dc} / ${total} (${pct}%)`;
+  document.getElementById('pfil').style.width=pct+'%';
+}
+
+function resetAll(){
+  const btn=document.getElementById('rbtn');
+  if(!confirmReset){
+    confirmReset=true;btn.textContent='Sure?';btn.style.borderColor='#E24B4A';btn.style.color='#E24B4A';
+    setTimeout(()=>{confirmReset=false;btn.textContent='Reset';btn.style.borderColor='';btn.style.color='';},3000);
+    return;
+  }
+  done={};saveDone();confirmReset=false;btn.textContent='Reset';btn.style.borderColor='';btn.style.color='';
+  render();
+}
+
+function render(){
+  const container=document.getElementById('weeks');
+  container.innerHTML='';
+  WEEKS.forEach((week,wi)=>{
+    const sec=document.createElement('div');sec.className='week';
+    const lbl=document.createElement('div');lbl.className='wlbl';lbl.textContent=WLBLS[wi];sec.appendChild(lbl);
+    const grid=document.createElement('div');grid.className='wgrid';
+    week.forEach(day=>{
+      const cell=document.createElement('div');
+      if(!day){cell.className='dc emp';grid.appendChild(cell);return;}
+      cell.className='dc'+(day===todayDay?' today':'');
+      const wd=getWd(day);
+      const sc=getSched(day);
+      const dc=sc.filter((_,i)=>done[sid(day,i)]).length;
+      const hdr=document.createElement('div');
+      hdr.className=`dh ${DH_CLASS[wd]}`;
+      hdr.innerHTML=`<div class="dn">${DNS[wd]}</div><div class="dd">${day}</div><div class="dp" id="dp${day}">${dc}/${sc.length}</div>`;
+      cell.appendChild(hdr);
+      const slist=document.createElement('div');slist.className='slist';
+      sc.forEach((slot,idx)=>{
+        const id=sid(day,idx);const isDone=!!done[id];
+        const chip=document.createElement('div');
+        chip.className='slot'+(isDone?' done':'');chip.id=id;
+        chip.style.borderLeftColor=slot.c;
+        chip.title=`${slot.t} — ${slot.l}`;
+        chip.onclick=()=>toggle(day,idx);
+        chip.innerHTML=`<span class="sl">${slot.l}<span class="st">${slot.t}</span></span><span class="sc">${isDone?'✓':''}</span>`;
+        slist.appendChild(chip);
+      });
+      cell.appendChild(slist);grid.appendChild(cell);
+    });
+    sec.appendChild(grid);container.appendChild(sec);
+  });
+  updateStats();
+}
+
+loadDone();render();
+</script>
+</body>
+</html>
